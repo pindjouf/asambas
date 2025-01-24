@@ -2,9 +2,20 @@
 
 import os
 import sys
+from enum import enum
 from rich.console import Console
 from rich.style import Style
 from rich.text import Text
+
+class Categories(Enum):
+    DP = auto()
+    B = auto()
+    LDR_STR = auto()
+    LDM_STM = auto()
+    MUL = auto()
+    MRS_MSR = auto()
+    CDP = auto()
+    SWI = auto()
 
 console = Console()
 error_style = Style(color="#fb4934", bold=True)
