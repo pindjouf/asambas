@@ -6,17 +6,27 @@ from enums import *
 
 
 def lexer(source_code):
-    op_names = [op.value for op in OP]
+    tokens = list()
+    opcodes = [str(op) for op in OPCODE]
+    directives = [str(directive) for directive in Directive]
+    registers = [reg.value[0] for reg in REG]
+
     with open(source_code, "r") as f:
         file = f.read()
         for line in file.split("\n"):
             line = line.split(";")[0].strip().lower()
             if line:
-                if any(line.startswith(op) for op in op_names):
-                    line = line.split()
-                    print(f"Found {line[0]} in line: '{line}'")
+                line_tokens = list()
+                for item in line.split():
+                    if item in opcodes or item in directives:
+                        line_tokens.append(item)
+                    if item.endswith(","):
+                        item = item[:-1]
+                        if item in registers:
+                            line_tokens.append(item)
+                tokens.extend(line_tokens)
 
-def instruction_decoder(instruction):
+    return tokens
 
 
 def args_check(arguments):
@@ -37,7 +47,7 @@ def main():
     if (args_check(sys.argv)):
         source_code = sys.argv[1]
         # object_file = sys.argv[3]
-        lexer(source_code)
+        print(lexer(source_code))
     else:
         print("Invalid arguments provided!")
         exit(1)

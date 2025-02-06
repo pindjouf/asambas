@@ -1,70 +1,73 @@
-from enum import Enum
+from enum import Enum, auto
 
-class OP(Enum):
+class OPCODE(Enum):
     # Arithmetic operations
-    ADD = 'add'     # Add
-    ADC = 'adc'     # Add with Carry
-    SUB = 'sub'     # Subtract
-    SBC = 'sbc'     # Subtract with Carry
-    RSB = 'rsb'     # Reverse Subtract
-    RSC = 'rsc'     # Reverse Subtract with Carry
-    MUL = 'mul'     # Multiply
-    MLA = 'mla'     # Multiply Accumulate
+    ADD = auto()     # Add
+    ADC = auto()     # Add with Carry
+    SUB = auto()     # Subtract
+    SBC = auto()     # Subtract with Carry
+    RSB = auto()     # Reverse Subtract
+    RSC = auto()     # Reverse Subtract with Carry
+    MUL = auto()     # Multiply
+    MLA = auto()     # Multiply Accumulate
     
-    # Logical operations
-    AND = 'and'     # Bitwise AND
-    EOR = 'eor'     # Bitwise XOR
-    ORR = 'orr'     # Bitwise OR
-    BIC = 'bic'     # Bit Clear
+    # Logiauto()perations
+    AND = auto()     # Bitwise AND
+    EOR = auto()     # Bitwise XOR
+    ORR = auto()     # Bitwise OR
+    BIC = auto()     # Bit Clear
     
-    # Comparison operations
-    CMP = 'cmp'     # Compare
-    CMN = 'cmn'     # Compare Negative
-    TST = 'tst'     # Test bits
-    TEQ = 'teq'     # Test Equivalence
+    # Compauto()n operations
+    CMP = auto()     # Compare
+    CMN = auto()     # Compare Negative
+    TST = auto()     # Test bits
+    TEQ = auto()     # Test Equivalence
     
     # Move operations
-    MOV = 'mov'     # Move
-    MVN = 'mvn'     # Move Not (bitwise NOT)
+    MOV = auto()     # Move
+    MVN = auto()     # Move Not (bitwise NOT)
     
     # Memory operations
-    LDR = 'ldr'     # Load Register
-    LDRB = 'ldrb'   # Load Register Byte
-    LDRH = 'ldrh'   # Load Register Halfword
-    STR = 'str'     # Store Register
-    STRB = 'strb'   # Store Register Byte
-    STRH = 'strh'   # Store Register Halfword
+    LDR = auto()     # Load Register
+    LDRB = auto()   # Load Register Byte
+    LDRH = auto()   # Load Register Halfword
+    STR = auto()   # Store Register
+    STRB = auto()   # Store Register Byte
+    STRH = auto()   # Store Register Halfword
     
     # Multiple register transfer
-    LDM = 'ldm'     # Load Multiple
-    STM = 'stm'     # Store Multiple
-    PUSH = 'push'   # Push registers
-    POP = 'pop'     # Pop registers
+    LDM = auto()     # Load Multiple
+    STM = auto()     # Store Multiple
+    PUSH = auto()   # Push registers
+    POP = auto()     # Pop registers
     
     # Branch instructions
-    B = 'b'         # Branch
-    BL = 'bl'       # Branch with Link
-    BX = 'bx'       # Branch and Exchange
-    BLX = 'blx'     # Branch with Link and Exchange
+    B = auto()         # Branch
+    BL = auto()       # Branch with Link
+    BX = auto()       # Branch and Exchange
+    BLX = auto()     # Branch with Link and Exchange
     
     # Status register access
-    MRS = 'mrs'     # Move from Status Register
-    MSR = 'msr'     # Move to Status Register
+    MRS = auto()     # Move from Status Register
+    MSR = auto()     # Move to Status Register
     
     # Barrel shifter operations
-    LSL = 'lsl'     # Logical Shift Left
-    LSR = 'lsr'     # Logical Shift Right
-    ASR = 'asr'     # Arithmetic Shift Right
-    ROR = 'ror'     # Rotate Right
-    RRX = 'rrx'     # Rotate Right with Extend
+    LSL = auto()     # Logical Shift Left
+    LSR = auto()     # Logical Shift Right
+    ASR = auto()     # Arithmetic Shift Right
+    ROR = auto()     # Rotate Right
+    RRX = auto()     # Rotate Right with Extend
     
     # System and coprocessor
-    SVC = 'svc'     # Supervisor Call (formerly SWI)
-    CDP = 'cdp'     # Coprocessor Data Processing
-    LDC = 'ldc'     # Load Coprocessor
-    STC = 'stc'     # Store Coprocessor
-    MCR = 'mcr'     # Move to Coprocessor from ARM Register
-    MRC = 'mrc'     # Move to ARM Register from Coprocessor
+    SVC = auto()     # Supervisor Call (formerly SWI)
+    CDP = auto()     # Coprocessor Data Processing
+    LDC = auto()     # Load Coprocessor
+    STC = auto()     # Store Coprocessor
+    MCR = auto()     # Move to Coprocessor from ARM Register
+    MRC = auto()     # Move to ARM Register from Coprocessor
+    
+    def __str__(self):
+        return self.name.lower()
 
 class COND(Enum):
     # Basic equality conditions
@@ -121,3 +124,40 @@ class REG(Enum):
     # Status registers
     CPSR = ('cpsr', None)    # Current Program Status Register
     SPSR = ('spsr', None)    # Saved Program Status Register
+
+class Directive(Enum):
+    ARM = auto()
+    THUMB = auto()
+    CODE_32 = auto()
+    AREA = auto()
+    SPACE = auto()
+    ALIGN = auto()
+    BYTE = auto()
+    WORD = auto()
+    ASCII = auto()
+    ASCIZ = auto()
+    EQU = auto()
+    GLOBAL = auto()
+    MACRO = auto()
+    ENDM = auto()
+    IF = auto()
+    ELSE = auto()
+    ENDIF = auto()
+    REPT = auto()
+    ENDR = auto()
+    ENTRY = auto()
+    END = auto()
+    INCLUDE = auto()
+    SECTION = auto()
+
+    def __str__(self):
+        return f".{self.name.lower()}"
+
+
+class TokenType(Enum):
+    Im = 1
+    Label = 2
+    Pointer = 3
+    Register = 4
+    Directive = 5
+    Instruction = 6
