@@ -1,57 +1,33 @@
-#!/usr/bin/env python3
+from isa import *
 
-import os
-import sys
-from enums import *
+# go to A5.2.3 for Data-processing (immediate) documentation
+with open("test.s", "r") as f:
+    line = f.read().split(";")[0].split()
 
+    for mnemonic in line:
+        line[line.index(mnemonic)] = mnemonic.lower()
 
-def lexer(source_code):
-    tokens = list()
-    opcodes = [str(op) for op in OPCODE]
-    directives = [str(directive) for directive in Directive]
-    registers = [reg.value[0] for reg in REG]
+    opcode = line[0]
+    second_op = line[1].split(",")[0]
+    imm = line[2][1:]
 
-    with open(source_code, "r") as f:
-        file = f.read()
-        for line in file.split("\n"):
-            line = line.split(";")[0].strip().lower()
-            if line:
-                line_tokens = list()
-                for item in line.split():
-                    if item in opcodes or item in directives:
-                        line_tokens.append(item)
-                    if item.endswith(","):
-                        item = item[:-1]
-                        if item in registers:
-                            line_tokens.append(item)
-                tokens.extend(line_tokens)
+    # Data-processing (immediate) & MOV in encoding A2
+    if opcode[-2:] in list(cond.keys()):
+        cond_field = cond.get(opcode[-2:])
+        category = "001"
+        encoding_type = "1101"
+        s_bit = "0"
+        first_op = "0000"
+        second_op = registers.get(second_op)
+        imm = str(bin(int(imm)))[2:]
 
-    return tokens
-
-
-def args_check(arguments):
-    if len(arguments) != 4:
-        print("Invalid number of arguments!")
-        exit(1)
-    elif (
-        os.path.exists(arguments[1])
-        and arguments[1].endswith((".s", ".asm"))
-        and arguments[2] == "-o"
-        and arguments[3].endswith(".o")
-        and not os.path.exists(arguments[3])
-    ):
-        return True
-
-
-def main():
-    if (args_check(sys.argv)):
-        source_code = sys.argv[1]
-        # object_file = sys.argv[3]
-        print(lexer(source_code))
+        if 12 - len(imm) != 0:
+            difference = "0" * (12 - len(imm))
+            output = int(cond_field + category + encoding_type + s_bit + first_op + second_op + difference + imm, 2).to_bytes(4, byteorder='big')
+            print(f"{line} = {cond_field + category + encoding_type + s_bit + first_op + second_op + difference + imm}")
+            # with open("test.bin", "wb") as f:
+            #     f.write(output)
+        else:
+            print(f"{line} = {cond_field + category + encoding_type + s_bit + first_op + second_op + imm}")
     else:
-        print("Invalid arguments provided!")
-        exit(1)
-
-
-if __name__ == "__main__":
-    main()
+        print(f"{opcode} doesn't have any conditions therefore it's AL or 0b1110")
