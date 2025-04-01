@@ -12,9 +12,9 @@ exit_code: .byte 0x16
 .section .text
 _start:
     mov r0, #0x01
-    ldr r1, =str_1
+    ldr r1, =str_1 ; pointing to str_1 broooo
     ldr r2, =len_1
-    ldrb r2, [r2]
+    ldrb r2, [r2] // dereferencing r2 broo
     bl print
     ldr r1, =str_2
     ldr r2, =len_2

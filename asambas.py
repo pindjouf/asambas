@@ -1,33 +1,79 @@
+import sys
 from isa import *
 
-# go to A5.2.3 for Data-processing (immediate) documentation
-with open("test.s", "r") as f:
-    line = f.read().split(";")[0].split()
+def first_pass(input_file: str) -> tuple[list, dict]:
+    line_count = 0
+    tracker = dict()
+    source_code = list()
+    symbol_table = dict()
 
-    for mnemonic in line:
-        line[line.index(mnemonic)] = mnemonic.lower()
+    with open(input_file, "r") as f:
+        file = f.read().split("\n")
 
-    opcode = line[0]
-    second_op = line[1].split(",")[0]
-    imm = line[2][1:]
+        for line in file:
+            line_count += 1
+            if line:
+                if "//" in line:
+                    line = line.split("//")[0].strip()
+                elif ";" in line:
+                    line = line.split(";")[0].strip()
 
-    # Data-processing (immediate) & MOV in encoding A2
-    if opcode[-2:] in list(cond.keys()):
-        cond_field = cond.get(opcode[-2:])
-        category = "001"
-        encoding_type = "1101"
-        s_bit = "0"
-        first_op = "0000"
-        second_op = registers.get(second_op)
-        imm = str(bin(int(imm)))[2:]
+                if line[:1] == ".":
+                    match line.split()[1]:
+                        case ".data":
+                            tracker = {'section': ".data", 'address': 0x0, 'line_count': line_count}
+                        case ".text":
+                            tracker = {'section': ".text", 'address': 0x0, 'line_count': line_count}
+                        case _:
+                            pass
 
-        if 12 - len(imm) != 0:
-            difference = "0" * (12 - len(imm))
-            output = int(cond_field + category + encoding_type + s_bit + first_op + second_op + difference + imm, 2).to_bytes(4, byteorder='big')
-            print(f"{line} = {cond_field + category + encoding_type + s_bit + first_op + second_op + difference + imm}")
-            # with open("test.bin", "wb") as f:
-            #     f.write(output)
-        else:
-            print(f"{line} = {cond_field + category + encoding_type + s_bit + first_op + second_op + imm}")
-    else:
-        print(f"{opcode} doesn't have any conditions therefore it's AL or 0b1110")
+                elif line[-1:] == ":":
+                    symbol_table.update({f'{line[:-1]}': f'{hex(tracker['address'])}'})
+
+                if tracker:
+                    if tracker['section'] == ".data":
+                        if line.split()[1][:1] == "." and line.split()[1] != ".text" and line.split()[1] != ".data":
+                            tracker['line_count'] = line_count
+                            match line.split()[1]:
+                                case ".byte":
+                                    tracker['address'] += 0x1
+                                case ".hword" | ".short":
+                                    tracker['address'] += 0x2
+                                case ".word":
+                                    tracker['address'] += 0x4
+                                case ".ascii":
+                                    string = line.split()[2][1:-1]
+                                    if "\\n" in string or "\\t" in string or "\\r" in string:
+                                        str_len = len(string) - 1
+                                        tracker['address'] += str_len
+                                case ".space" | ".skip":
+                                    pass
+                                case _:
+                                    pass
+
+                    elif tracker['section'] == ".text":
+                        tracker['line_count'] = line_count
+                        if not ".text" in line.split() and line[-1:] != ":":
+                            tracker['address'] += 0x4
+
+                line = line.strip().split()
+                tracker['line'] = line
+
+                for i in line:
+                    if "r" in i and "," in i:
+                        line[line.index(i)] = line[line.index(i)][:-1]
+                source_code.append(tracker.copy())
+
+    return source_code, symbol_table
+
+def main():
+    source_code, symbol_table = first_pass(sys.argv[1])
+
+    for line in source_code:
+        print(line)
+
+    print(f"\nSymbol table: {symbol_table}")
+
+if __name__ == "__main__":
+    main()
+

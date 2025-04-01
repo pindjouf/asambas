@@ -25,7 +25,7 @@ registers = {
 }
 
 opcodes = {
-    "add": 0b1010
+    "add": "1010"
 }
 
 cond = {
