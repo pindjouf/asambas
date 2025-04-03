@@ -81,7 +81,10 @@ def first_pass(input_file: str) -> tuple[list, dict]:
                                 if just_passed_label == True:
                                     just_passed_label = False
                                 else:
-                                    tracker['address'] += 0x4
+                                    if tracker['current_mode'] == ".thumb":
+                                        tracker['address'] += 0x2
+                                    else:
+                                        tracker['address'] += 0x4
 
                 # symbol table management
                 if line:
