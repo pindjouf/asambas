@@ -11,6 +11,7 @@ exit_code: .byte 0x16
 
 .section .text
 _start:
+    ; doing shit
     mov r0, #0x01
     ldr r1, =str_1 ; pointing to str_1 broooo
     ldr r2, =len_1
