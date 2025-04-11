@@ -28,13 +28,13 @@ def first_pass(input_file: str) -> tuple[list, dict]:
                     if line.split()[0] == ".section":
                         match line.split()[1]:
                             case ".data":
-                                tracker = {'section': ".data", 'current_mode': ".arm", 'address': 0x0, 'line_count': line_count}
+                                tracker = {'section': ".data", 'state': ".arm", 'address': 0x0, 'line_count': line_count}
                             case ".text":
-                                tracker = {'section': ".text", 'current_mode': ".arm", 'address': 0x0, 'line_count': line_count}
+                                tracker = {'section': ".text", 'state': ".arm", 'address': 0x0, 'line_count': line_count}
                             case ".bss":
-                                tracker = {'section': ".bss", 'current_mode': ".arm", 'address': 0x0, 'line_count': line_count}
+                                tracker = {'section': ".bss", 'state': ".arm", 'address': 0x0, 'line_count': line_count}
                             case ".rodata":
-                                tracker = {'section': ".rodata", 'current_mode': ".arm", 'address': 0x0, 'line_count': line_count}
+                                tracker = {'section': ".rodata", 'state': ".arm", 'address': 0x0, 'line_count': line_count}
                             case _:
                                 pass
 
@@ -63,16 +63,16 @@ def first_pass(input_file: str) -> tuple[list, dict]:
 
                     elif tracker['section'] == ".text":
                         if ".thumb" in line.split():
-                            tracker['current_mode'] = ".thumb"
+                            tracker['state'] = ".thumb"
                         elif ".arm" in line.split():
-                            tracker['current_mode'] = ".arm"
+                            tracker['state'] = ".arm"
 
                         if ".text" in line.split():
                             pass
                         elif line[-1:] == ":":
                             just_passed_label = True
 
-                            if tracker['current_mode'] == ".thumb":
+                            if tracker['state'] == ".thumb":
                                 tracker['address'] += 0x2
                             else:
                                 tracker['address'] += 0x4
@@ -81,7 +81,7 @@ def first_pass(input_file: str) -> tuple[list, dict]:
                                 if just_passed_label == True:
                                     just_passed_label = False
                                 else:
-                                    if tracker['current_mode'] == ".thumb":
+                                    if tracker['state'] == ".thumb":
                                         tracker['address'] += 0x2
                                     else:
                                         tracker['address'] += 0x4
