@@ -1,6 +1,13 @@
 import sys
 from isa import *
 
+def picker(source_code, symbol_table, section, address) -> dict:
+    for line in source_code:
+        if 'address' in line:
+            line['address'] = hex(line['address'])
+            if line['section'] == section and line['address'] == address and (not line['line'][0] in symbol_table):
+                return line
+
 def first_pass(input_file: str) -> tuple[list, dict]:
     line_count = 0
     tracker = dict()
@@ -93,7 +100,12 @@ def first_pass(input_file: str) -> tuple[list, dict]:
 
                 # make clean list of vals in line
                 line = line.strip().split()
-                tracker['line'] = line
+                if line:
+                    if line[0][-1:] == ":":
+                        line[0] = line[0].replace(":", "")
+                        tracker['line'] = line
+                    else:
+                        tracker['line'] = line
 
                 # clean up regs in list
                 for i in line:
@@ -109,14 +121,15 @@ def first_pass(input_file: str) -> tuple[list, dict]:
 def main():
     source_code, symbol_table = first_pass(sys.argv[1])
 
-    for line in source_code:
-        if 'address' in line:
-            line['address'] = hex(line['address'])
-            print(line)
-        else:
-            print(line)
+    # for line in source_code:
+    #     if 'address' in line:
+    #         line['address'] = hex(line['address'])
+    #         print(line)
+    #     else:
+    #         print(line)
 
     print(f"\nSymbol table: {symbol_table}")
+    print(picker(source_code, symbol_table, '.text', '0x4'))
 
 if __name__ == "__main__":
     main()
